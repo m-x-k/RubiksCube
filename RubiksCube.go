@@ -3,6 +3,7 @@ package main
 import "fmt"
 import "math/rand"
 import "strconv"
+import "errors"
 
 const (
 	WHITE  = "w"
@@ -13,43 +14,82 @@ const (
 	ORANGE = "o"
 )
 
+var m = map[string]int{}
+
 func main() {
 	fmt.Println("Starting Rubiks Cube")
-	var a = getSide()
-	printSide(a, 1)
-	printSide(a, 2)
-	printSide(a, 3)
-	printSide(a, 4)
-	printSide(a, 5)
-	printSide(a, 6)
+	NewRubiksCube()
+
+	printSide(getSide(), 1)
+	printSide(getSide(), 2)
+	printSide(getSide(), 3)
+	printSide(getSide(), 4)
+	printSide(getSide(), 5)
+	printSide(getSide(), 6)
+
+	ensureNoBlocksRemaining(m)
+
 	fmt.Println("Ending Rubiks Cube")
 }
 
-func randomPiece() string {
-	var r = rand.Intn(5)
-	if (r == 0) {
+func NewRubiksCube() {
+	m[WHITE]  = 9
+	m[BLUE]   = 9
+	m[RED]    = 9
+	m[GREEN]  = 9
+	m[YELLOW] = 9
+	m[ORANGE] = 9
+}
+
+func ensureNoBlocksRemaining(m map[string]int) {
+	for _, value := range m {
+		if (value != 0) {
+			panic(errors.New("Something went wrong all blocks are not used"))
+		}
+	}
+}
+
+func randomBlock() string {
+	var rand = rand.Intn(6)
+	var block = intToBlock(rand)
+	if (m[block] >= 1) {
+		m[block] -= 1
+		return block
+	}
+	if (m[block] < 0) {
+		panic(errors.New("Too many blocks used"))
+	}
+
+	return randomBlock()
+}
+
+func intToBlock(i int) string {
+	if (i == 0) {
 		return WHITE
 	}
-	if (r == 1) {
+	if (i == 1) {
 		return BLUE
 	}
-	if (r == 2) {
+	if (i == 2) {
 		return RED
 	}
-	if (r == 3) {
+	if (i == 3) {
 		return GREEN
 	}
-	if (r == 4) {
+	if (i == 4) {
 		return YELLOW
 	}
-	return ORANGE
+	if (i == 5) {
+		return ORANGE
+	}
+	panic(errors.New("Unknown block"))
 }
 
 func getSide() [3][3]string {
 	var a = [3][3]string{
-		{randomPiece(), randomPiece(), randomPiece()},
-		{randomPiece(), randomPiece(), randomPiece()},
-		{randomPiece(), randomPiece(), randomPiece()},
+		{randomBlock(), randomBlock(), randomBlock()},
+		{randomBlock(), randomBlock(), randomBlock()},
+		{randomBlock(), randomBlock(), randomBlock()},
 	}
 	return a
 }
